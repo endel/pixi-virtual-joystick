@@ -1,8 +1,3 @@
-/**
- * Implementation based on
- * https://github.com/Yuntwo/game-pixi/blob/master/h5/component/joystick.js
- */
-
 import * as PIXI from "pixi.js";
 
 export enum Direction {
@@ -16,80 +11,84 @@ export enum Direction {
   BOTTOM_RIGHT = 'bottom_right',
 }
 
+export interface JoystickSettings {
+  outer: string,
+  inner: string,
+  outerScale?: { x: number, y: number },
+  innerScale?: { x: number, y: number },
+  onChange: (data: { angle: number, direction: Direction, power: number }) => void;
+  onStart?: () => void;
+  onEnd?: () => void;
+}
+
 export class Joystick extends PIXI.Container {
-  settings: any;
-  containerJoystick: PIXI.Container;
+  settings: JoystickSettings;
+  elements: PIXI.Container;
   outer: PIXI.Sprite;
   inner: PIXI.Sprite;
   outerRadius: number = 0;
   innerRadius: number = 0;
 
-  constructor(opts) {
+  constructor(opts: JoystickSettings) {
     super();
 
-    this.settings = opts;
+    this.settings = Object.assign({
+      outerScale: { x: 1, y: 1 },
+      innerScale: { x: 1, y: 1 },
+    }, opts);
 
     this.loadResources(() => this.initialize());
   }
 
 
-  /**
-  * 资源加载
-  * @param {*} callback
-  */
   loadResources(callback: () => void) {
-    PIXI.Loader.shared.add('outer', this.settings.outer);
-    PIXI.Loader.shared.add('inner', this.settings.inner);
-    PIXI.Loader.shared.onComplete.once(() => callback?.());
-    PIXI.Loader.shared.load();
+    const loader = new PIXI.Loader();
+    loader.add('outer', this.settings.outer);
+    loader.add('inner', this.settings.inner);
+    loader.onComplete.once(() => callback?.());
+    loader.load();
   }
 
-  /**
-  * 初始化摇杆
-  */
   initialize() {
     let outerImg = PIXI.Texture.from(this.settings.outer);
     let innerImg = PIXI.Texture.from(this.settings.inner);
 
-    this.containerJoystick = new PIXI.Container();
+    this.elements = new PIXI.Container();
 
     this.outer = new PIXI.Sprite(outerImg);
     this.inner = new PIXI.Sprite(innerImg);
 
-    this.outer.scale = this.settings.outerScale;
-    this.inner.scale = this.settings.innerScale;
+    this.outer.scale.set(this.settings.outerScale.x, this.settings.outerScale.y);
+    this.inner.scale.set(this.settings.innerScale.x, this.settings.innerScale.y);
 
     this.outer.anchor.set(0.5);
     this.inner.anchor.set(0.5);
 
-    // this.containerJoystick.anchor.set(0.5);
-    this.containerJoystick.addChild(this.outer);
-    this.containerJoystick.addChild(this.inner);
+    this.elements.addChild(this.outer);
+    this.elements.addChild(this.inner);
 
-    // this.outerRadius = this.containerJoystick.width / 2; //外置摇杆半径
-    this.outerRadius = this.containerJoystick.width / 2.5; //外置摇杆半径
-    this.innerRadius = this.inner.width / 2; //内置摇杆半径
+    // this.outerRadius = this.containerJoystick.width / 2;
+    this.outerRadius = this.elements.width / 2.5;
+    this.innerRadius = this.inner.width / 2;
 
-    this.containerJoystick.position.set(this.position.x, this.position.y);
-    this.addChild(this.containerJoystick);
+    this.elements.position.set(this.position.x, this.position.y);
+    this.addChild(this.elements);
 
     this.bindEvents();
   }
 
-  /**
-  * 初始化事件
-  */
   protected bindEvents() {
     let that = this;
-    this.containerJoystick.interactive = true;
+    this.elements.interactive = true;
 
     let dragging: boolean = false;
     let eventData: PIXI.InteractionData;
+    let power: number;
 
     function onDragStart(event: PIXI.InteractionEvent) {
       eventData = event.data;
 
-      let startPosition = eventData.getLocalPosition(this.parent);
+      // let startPosition = eventData.getLocalPosition(this.parent);
       dragging = true;
 
       that.settings.onStart?.();
@@ -113,29 +112,22 @@ export class Joystick extends PIXI.Container {
       let sideY = newPosition.y - that.position.y;
 
       let centerPoint = new PIXI.Point(0, 0);
-      let currentAngle = 0;
+      let angle = 0;
 
-      if (sideX == 0 && sideY == 0) {
-        return;
-      }
+      if (sideX == 0 && sideY == 0) { return; }
 
-      //判断执行计算的半径。
       let calRadius = 0;
 
-      //判断移动的距离是否超过外圈，参考勾股定理
       if (sideX * sideX + sideY * sideY >= that.outerRadius * that.outerRadius) {
         calRadius = that.outerRadius;
-        //超过外圈，以外圈半径计算。
       }
       else {
-        //未超过，以内外圈差值计算
         calRadius = that.outerRadius - that.innerRadius;
       }
 
-      //采用WebGL使用的是正交右手坐标系
       /**
-       * x轴最左边为-1，最右边为1；
-       * y轴最下边为-1，最上边为1；
+       * x:   -1 <-> 1
+       * y:   -1 <-> 1
        *          Y
        *          ^
        *          |
@@ -148,54 +140,46 @@ export class Joystick extends PIXI.Container {
 
       let direction = Direction.LEFT;
 
-      //X轴方向没有移动
       if (sideX == 0) {
         if (sideY > 0) {
           centerPoint.set(0, (sideY > that.outerRadius) ? that.outerRadius : sideY);
-          currentAngle = 270;
+          angle = 270;
           direction = Direction.BOTTOM;
         } else {
           centerPoint.set(0, -(Math.abs(sideY) > that.outerRadius ? that.outerRadius : Math.abs(sideY)));
-          currentAngle = 90;
+          angle = 90;
           direction = Direction.TOP;
         }
         that.inner.position = centerPoint;
-        that.settings.onChange({
-          angle: currentAngle,
-          direction
-        });
+        power = that.getPower(centerPoint);
+        that.settings.onChange({ angle, direction, power, });
         return;
       }
 
-      if (sideY == 0) {//Y轴方向没有移动
+      if (sideY == 0) {
         if (sideX > 0) {
           centerPoint.set((Math.abs(sideX) > that.outerRadius ? that.outerRadius : Math.abs(sideX)), 0);
-          currentAngle = 0;
+          angle = 0;
           direction = Direction.LEFT;
         } else {
           centerPoint.set(-(Math.abs(sideX) > that.outerRadius ? that.outerRadius : Math.abs(sideX)), 0);
-          currentAngle = 180;
+          angle = 180;
           direction = Direction.RIGHT;
         }
 
         that.inner.position = centerPoint;
-        that.settings.onChange({
-          angle: currentAngle,
-          direction
-        });
+        power = that.getPower(centerPoint);
+        that.settings.onChange({ angle, direction, power, });
         return;
       }
 
       let tanVal = Math.abs(sideY / sideX);
       let radian = Math.atan(tanVal);
-      let angle = radian * 180 / Math.PI;
-      currentAngle = angle;
+      angle = radian * 180 / Math.PI;
 
-      //计算现在摇杆的中心点主坐标了。
       let centerX = 0;
       let centerY = 0;
 
-      //移动的距离是否超过外圈
       if (sideX * sideX + sideY * sideY >= that.outerRadius * that.outerRadius) {
         centerX = that.outerRadius * Math.cos(radian);
         centerY = that.outerRadius * Math.sin(radian);
@@ -213,60 +197,61 @@ export class Joystick extends PIXI.Container {
       }
 
       if (sideX > 0 && sideY < 0) {
-        //角度小于90度，对应右上角区域
+        // < 90
       }
       else if (sideX < 0 && sideY < 0) {
-        //90度<角度<180度，对应左下角区域
-        currentAngle = 180 - currentAngle;
+        // 90 ~ 180
+        angle = 180 - angle;
       }
       else if (sideX < 0 && sideY > 0) {
-        //180度<角度<270度，对应左下角区域
-        currentAngle = currentAngle + 180;
+        // 180 ~ 270
+        angle = angle + 180;
       }
       else if (sideX > 0 && sideY > 0) {
-        //270度<角度<369度，对应右下角区域
-        currentAngle = 360 - currentAngle;
+        // 270 ~ 369
+        angle = 360 - angle;
       }
       centerPoint.set(centerX, centerY);
+      power = that.getPower(centerPoint);
 
-      direction = getDirection(centerPoint);
+      direction = that.getDirection(centerPoint);
       that.inner.position = centerPoint;
 
-      that.settings.onChange({
-        angle: currentAngle,
-        direction
-      });
+      that.settings.onChange({ angle, direction, power, });
     };
 
-    this.containerJoystick.on('pointerdown', onDragStart)
+    this.elements.on('pointerdown', onDragStart)
       .on('pointerup', onDragEnd)
       .on('pointerupoutside', onDragEnd)
       .on('pointermove', onDragMove)
+  }
 
-    /**
-     * 获得方向
-     * @param {*} pos
-     */
-    function getDirection(pos) {
-      let rad = Math.atan2(pos.y, pos.x);// [-PI, PI]
-      if ((rad >= -Math.PI / 8 && rad < 0) || (rad >= 0 && rad < Math.PI / 8)) {
-        return Direction.RIGHT;
-      } else if (rad >= Math.PI / 8 && rad < 3 * Math.PI / 8) {
-        return Direction.BOTTOM_RIGHT;
-      } else if (rad >= 3 * Math.PI / 8 && rad < 5 * Math.PI / 8) {
-        return Direction.BOTTOM;
-      } else if (rad >= 5 * Math.PI / 8 && rad < 7 * Math.PI / 8) {
-        return Direction.BOTTOM_LEFT;
-      } else if ((rad >= 7 * Math.PI / 8 && rad < Math.PI) || (rad >= -Math.PI && rad < -7 * Math.PI / 8)) {
-        return Direction.LEFT;
-      } else if (rad >= -7 * Math.PI / 8 && rad < -5 * Math.PI / 8) {
-        return Direction.TOP_LEFT;
-      } else if (rad >= -5 * Math.PI / 8 && rad < -3 * Math.PI / 8) {
-        return Direction.TOP;
-      } else {
-        return Direction.TOP_RIGHT;
-      }
+  protected getPower(centerPoint: PIXI.Point) {
+    const a = centerPoint.x - 0;
+    const b = centerPoint.y - 0;
+    return Math.sqrt(a * a + b * b) / this.outerRadius;
+  }
+
+  protected getDirection(pos) {
+    let rad = Math.atan2(pos.y, pos.x);// [-PI, PI]
+    if ((rad >= -Math.PI / 8 && rad < 0) || (rad >= 0 && rad < Math.PI / 8)) {
+      return Direction.RIGHT;
+    } else if (rad >= Math.PI / 8 && rad < 3 * Math.PI / 8) {
+      return Direction.BOTTOM_RIGHT;
+    } else if (rad >= 3 * Math.PI / 8 && rad < 5 * Math.PI / 8) {
+      return Direction.BOTTOM;
+    } else if (rad >= 5 * Math.PI / 8 && rad < 7 * Math.PI / 8) {
+      return Direction.BOTTOM_LEFT;
+    } else if ((rad >= 7 * Math.PI / 8 && rad < Math.PI) || (rad >= -Math.PI && rad < -7 * Math.PI / 8)) {
+      return Direction.LEFT;
+    } else if (rad >= -7 * Math.PI / 8 && rad < -5 * Math.PI / 8) {
+      return Direction.TOP_LEFT;
+    } else if (rad >= -5 * Math.PI / 8 && rad < -3 * Math.PI / 8) {
+      return Direction.TOP;
+    } else {
+      return Direction.TOP_RIGHT;
     }
   }
+
 
 }
