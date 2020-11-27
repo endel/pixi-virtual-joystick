@@ -1,0 +1,35 @@
+{
+  "name": "pixi-joystick",
+  "version": "1.0.0",
+  "description": "🕹 pixi.js touch joystick",
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "parcel example/index.html ./example",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endel/pixi-joystick.git"
+  },
+  "keywords": [
+    "pixi",
+    "joystick",
+    "touch",
+    "controls",
+    "pixijs"
+  ],
+  "author": "Endel Dreyer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/endel/pixi-joystick/issues"
+  },
+  "homepage": "https://github.com/endel/pixi-joystick#readme",
+  "devDependencies": {
+    "parcel": "^1.12.4",
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "images": "^3.2.3",
+    "pixi.js": "^5.3.3"
+  }
+}
