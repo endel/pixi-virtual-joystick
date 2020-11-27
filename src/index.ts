@@ -1,3 +1,8 @@
+/**
+ * Implementation based on
+ * https://github.com/Yuntwo/game-pixi/blob/master/h5/component/joystick.js
+ */
+
 import * as PIXI from "pixi.js";
 
 export enum Direction {
@@ -11,21 +16,20 @@ export enum Direction {
   BOTTOM_RIGHT = 'bottom_right',
 }
 
-export class Joystick {
+export class Joystick extends PIXI.Container {
   settings: any;
-  parentContainer: PIXI.Container;
   containerJoystick: PIXI.Container;
   outer: PIXI.Sprite;
   inner: PIXI.Sprite;
   outerRadius: number = 0;
   innerRadius: number = 0;
 
-  constructor(parentContainer: PIXI.Container, opts) {
-    this.settings = opts;
-    this.parentContainer = parentContainer;
+  constructor(opts) {
+    super();
 
-    //加载相关资源
-    this.loadResources(() => this.initRocker());
+    this.settings = opts;
+
+    this.loadResources(() => this.initialize());
   }
 
 
@@ -43,7 +47,7 @@ export class Joystick {
   /**
   * 初始化摇杆
   */
-  initRocker() {
+  initialize() {
     let outerImg = PIXI.Texture.from(this.settings.outer);
     let innerImg = PIXI.Texture.from(this.settings.inner);
 
@@ -66,25 +70,16 @@ export class Joystick {
     this.outerRadius = this.containerJoystick.width / 2.5; //外置摇杆半径
     this.innerRadius = this.inner.width / 2; //内置摇杆半径
 
-    this.containerJoystick.position.set(this.settings.rockerX, this.settings.rockerY);
-    this.parentContainer.addChild(this.containerJoystick);
-    this.initRockerEvents();
-  }
+    this.containerJoystick.position.set(this.position.x, this.position.y);
+    this.addChild(this.containerJoystick);
 
-
-  /**
-  * 初始化摇杆
-  */
-  position(x, y) {
-    this.settings.rockerX = x;
-    this.settings.rockerY = y;
-    this.containerJoystick.position.set(this.settings.rockerX, this.settings.rockerY);
+    this.bindEvents();
   }
 
   /**
   * 初始化事件
   */
-  initRockerEvents() {
+  protected bindEvents() {
     let that = this;
     this.containerJoystick.interactive = true;
 
@@ -96,33 +91,26 @@ export class Joystick {
 
       let startPosition = eventData.getLocalPosition(this.parent);
       dragging = true;
-      if (that.settings.onJoyStickStart != undefined) {
-        that.settings.onJoyStickStart();
-      }
+
+      that.settings.onStart?.();
     }
 
     function onDragEnd(event) {
-      if (dragging == false) {
-        return;
-      }
+      if (dragging == false) { return; }
+
       dragging = false;
       that.inner.position.set(0, 0);
 
-      if (that.settings.onJoyStickEnd != undefined) {
-        that.settings.onJoyStickEnd();
-      }
+      that.settings.onEnd?.();
     }
 
     function onDragMove(event) {
-      if (dragging == false) {
-        return;
-      }
+      if (dragging == false) { return; }
 
-      // let newPosition = eventData.getLocalPosition(that.containerJoystick);
       let newPosition = eventData.getLocalPosition(this.parent);
 
-      let sideX = newPosition.x - that.settings.rockerX;
-      let sideY = newPosition.y - that.settings.rockerY;
+      let sideX = newPosition.x - that.position.x;
+      let sideY = newPosition.y - that.position.y;
 
       let centerPoint = new PIXI.Point(0, 0);
       let currentAngle = 0;
@@ -172,7 +160,7 @@ export class Joystick {
           direction = Direction.TOP;
         }
         that.inner.position = centerPoint;
-        that.settings.onJoyStickMove({
+        that.settings.onChange({
           angle: currentAngle,
           direction
         });
@@ -191,7 +179,7 @@ export class Joystick {
         }
 
         that.inner.position = centerPoint;
-        that.settings.onJoyStickMove({
+        that.settings.onChange({
           angle: currentAngle,
           direction
         });
@@ -244,7 +232,7 @@ export class Joystick {
       direction = getDirection(centerPoint);
       that.inner.position = centerPoint;
 
-      that.settings.onJoyStickMove({
+      that.settings.onChange({
         angle: currentAngle,
         direction
       });

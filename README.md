@@ -1,6 +1,8 @@
 # 🕹 pixi-virtual-joystick
 
-Virtual Joystick for [pixi.js](https://github.com/pixijs/pixi.js).
+Virtual Touch Joystick for [pixi.js](https://github.com/pixijs/pixi.js)
+
+<img src="screenshot.gif?raw=1" />
 
 ## Usage
 
@@ -28,6 +30,10 @@ const joystick = new Joystick(container, {
 app.stage.addChild(container);
 ```
 
+## Similar software
+
+- [nipplejs](https://github.com/yoannmoinet/nipplejs/) (more features, DOM-based)
+
 ## License
 
-Endel Dreyer  MIT
+Endel Dreyer © MIT
