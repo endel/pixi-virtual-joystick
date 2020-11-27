@@ -1,12 +1,16 @@
 {
   "name": "pixi-virtual-joystick",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "🕹 Virtual Touch Joystick for pixi.js",
   "main": "lib/index.js",
   "scripts": {
+    "prepublishOnly": "tsc",
     "start": "parcel example/index.html ./example",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "lib", "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/endel/pixi-joystick.git"

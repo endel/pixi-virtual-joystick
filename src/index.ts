@@ -23,11 +23,13 @@ export interface JoystickSettings {
 
 export class Joystick extends PIXI.Container {
   settings: JoystickSettings;
-  elements: PIXI.Container;
-  outer: PIXI.Sprite;
-  inner: PIXI.Sprite;
+
   outerRadius: number = 0;
   innerRadius: number = 0;
+
+  elements = new PIXI.Container();;
+  outer!: PIXI.Sprite;
+  inner!: PIXI.Sprite;
 
   constructor(opts: JoystickSettings) {
     super();
@@ -53,13 +55,13 @@ export class Joystick extends PIXI.Container {
     let outerImg = PIXI.Texture.from(this.settings.outer);
     let innerImg = PIXI.Texture.from(this.settings.inner);
 
-    this.elements = new PIXI.Container();
+    this.elements
 
     this.outer = new PIXI.Sprite(outerImg);
     this.inner = new PIXI.Sprite(innerImg);
 
-    this.outer.scale.set(this.settings.outerScale.x, this.settings.outerScale.y);
-    this.inner.scale.set(this.settings.innerScale.x, this.settings.innerScale.y);
+    this.outer.scale.set(this.settings.outerScale!.x, this.settings.outerScale!.y);
+    this.inner.scale.set(this.settings.innerScale!.x, this.settings.innerScale!.y);
 
     this.outer.anchor.set(0.5);
     this.inner.anchor.set(0.5);
@@ -94,7 +96,7 @@ export class Joystick extends PIXI.Container {
       that.settings.onStart?.();
     }
 
-    function onDragEnd(event) {
+    function onDragEnd(event: PIXI.InteractionEvent) {
       if (dragging == false) { return; }
 
       dragging = false;
@@ -103,10 +105,10 @@ export class Joystick extends PIXI.Container {
       that.settings.onEnd?.();
     }
 
-    function onDragMove(event) {
+    function onDragMove(event: PIXI.InteractionEvent) {
       if (dragging == false) { return; }
 
-      let newPosition = eventData.getLocalPosition(this.parent);
+      let newPosition = eventData.getLocalPosition(that);
 
       let sideX = newPosition.x - that.position.x;
       let sideY = newPosition.y - that.position.y;
@@ -232,8 +234,8 @@ export class Joystick extends PIXI.Container {
     return Math.sqrt(a * a + b * b) / this.outerRadius;
   }
 
-  protected getDirection(pos) {
-    let rad = Math.atan2(pos.y, pos.x);// [-PI, PI]
+  protected getDirection(center: PIXI.Point) {
+    let rad = Math.atan2(center.y, center.x);// [-PI, PI]
     if ((rad >= -Math.PI / 8 && rad < 0) || (rad >= 0 && rad < Math.PI / 8)) {
       return Direction.RIGHT;
     } else if (rad >= Math.PI / 8 && rad < 3 * Math.PI / 8) {
