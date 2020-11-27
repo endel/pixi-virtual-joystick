@@ -13,12 +13,22 @@ const joystick = new Joystick({
   outer: "images/joystick.png",
   inner: "images/joystick-handle.png",
 
-  outerScale: { x: 0.3, y: 0.3 },
-  innerScale: { x: 0.5, y: 0.5 },
+  outerScale: { x: 0.5, y: 0.5 },
+  innerScale: { x: 0.8, y: 0.8 },
 
-  onChange: (data) => console.log('onJoyStickMove:', data),
-  onStart: () => console.log('onJoyStickStart:'),
-  onEnd: () => console.log('onJoyStickEnd:'),
+  onChange: (data) => {
+    console.log(data.angle);
+    console.log(data.direction);
+    console.log(data.power);
+  },
+
+  onStart: () => {
+    console.log('start')
+  },
+
+  onEnd: () => {
+    console.log('end')
+  },
 });
 
 app.stage.addChild(joystick);
