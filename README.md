@@ -4,6 +4,8 @@ Virtual Touch Joystick for [pixi.js](https://github.com/pixijs/pixi.js)
 
 <img src="screenshot.gif?raw=1" />
 
+> (There are still a few things I'd like to change on this to be ready to use!)
+
 ## Usage
 
 ```typescript
