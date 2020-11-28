@@ -1,5 +1,11 @@
 import * as PIXI from "pixi.js";
 
+export interface JoystickChangeEvent {
+  angle: number;
+  direction: Direction;
+  power: number;
+}
+
 export enum Direction {
   LEFT = 'left',
   TOP = 'top',
@@ -16,7 +22,7 @@ export interface JoystickSettings {
   inner?: PIXI.Sprite | PIXI.Graphics | PIXI.Container,
   outerScale?: { x: number, y: number },
   innerScale?: { x: number, y: number },
-  onChange?: (data: { angle: number, direction: Direction, power: number }) => void;
+  onChange?: (data: JoystickChangeEvent) => void;
   onStart?: () => void;
   onEnd?: () => void;
 }
