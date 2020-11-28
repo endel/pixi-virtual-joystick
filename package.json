@@ -1,8 +1,9 @@
 {
   "name": "pixi-virtual-joystick",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "🕹 Virtual Touch Joystick for pixi.js",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "prepublishOnly": "tsc",
     "start": "parcel example/index.html ./example",
