@@ -30,8 +30,8 @@ function initialize() {
   app.stage.addChild(leftJoystick);
 
   const rightJoystick = new Joystick({
-    outer: PIXI.Sprite.from('outer'),
-    inner: PIXI.Sprite.from('inner'),
+    // outer: PIXI.Sprite.from('outer'),
+    // inner: PIXI.Sprite.from('inner'),
     outerScale: { x: 0.5, y: 0.5 },
     innerScale: { x: 0.8, y: 0.8 },
     onChange: (data) => { rightText.text = JSON.stringify(data); },

@@ -4,16 +4,14 @@ Virtual Touch Joystick for [pixi.js](https://github.com/pixijs/pixi.js)
 
 <img src="screenshot.gif?raw=1" />
 
-> (There are still a few things I'd like to change on this to be ready to use!)
-
 ## Usage
 
 ```typescript
 import { Joystick } from "pixi-virtual-joystick";
 
 const joystick = new Joystick({
-  outer: "images/joystick.png",
-  inner: "images/joystick-handle.png",
+  outer: PIXI.Sprite.from("outer"), // ("images/joystick.png")
+  inner: PIXI.Sprite.from("inner"), // ("images/joystick-handle.png")
 
   outerScale: { x: 0.5, y: 0.5 },
   innerScale: { x: 0.8, y: 0.8 },

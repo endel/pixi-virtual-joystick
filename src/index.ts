@@ -41,7 +41,7 @@ export class Joystick extends PIXI.Container {
     if (!this.settings.outer) {
       const outer = new PIXI.Graphics();
       outer.beginFill(0x000000);
-      outer.drawCircle(0, 0, 30);
+      outer.drawCircle(0, 0, 150);
       outer.alpha = 0.5;
       this.settings.outer = outer;
     }
@@ -49,7 +49,7 @@ export class Joystick extends PIXI.Container {
     if (!this.settings.inner) {
       const inner = new PIXI.Graphics();
       inner.beginFill(0x000000);
-      inner.drawCircle(0, 0, 15);
+      inner.drawCircle(0, 0, 70);
       inner.alpha = 0.8;
       this.settings.inner = inner;
     }
