@@ -32,8 +32,6 @@ function initialize() {
   const rightJoystick = new Joystick({
     // outer: PIXI.Sprite.from('outer'),
     // inner: PIXI.Sprite.from('inner'),
-    outerScale: { x: 0.5, y: 0.5 },
-    innerScale: { x: 0.8, y: 0.8 },
     onChange: (data) => { rightText.text = JSON.stringify(data); },
     onStart: () => console.log('start'),
     onEnd: () => console.log('end'),
