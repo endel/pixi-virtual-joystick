@@ -6,7 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "prepublishOnly": "tsc",
-    "start": "parcel example/index.html ./example",
+    "start": "parcel example/index.html",
+    "build": "parcel build example/index.html --public-url /pixi-virtual-joystick",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
