@@ -11,7 +11,7 @@ PIXI.Loader.shared
 function initialize() {
   const app = new PIXI.Application({
     view: document.getElementById('canvas') as HTMLCanvasElement,
-    backgroundColor: 0x45ffb5,
+    backgroundColor: 0xffffff,
     autoDensity: true,
     resolution: window.devicePixelRatio,
   });
