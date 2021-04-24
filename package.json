@@ -1,6 +1,6 @@
 {
   "name": "pixi-virtual-joystick",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "🕹 Virtual Touch Joystick for pixi.js",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -11,7 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
-    "lib", "README.md"
+    "lib",
+    "README.md"
   ],
   "repository": {
     "type": "git",
@@ -31,13 +32,12 @@
   },
   "homepage": "https://github.com/endel/pixi-joystick#readme",
   "devDependencies": {
+    "images": "^3.2.3",
     "parcel": "^1.12.4",
-    "typescript": "^4.1.2",
-    "images": "^3.2.3"
-  },
-  "dependencies": {
+    "pixi.js": "^6.0.2",
+    "typescript": "^4.1.3"
   },
   "peerDependencies": {
-    "pixi.js": "^5.3.3"
+    "pixi.js": "*"
   }
 }
