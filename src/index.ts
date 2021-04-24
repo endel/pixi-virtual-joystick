@@ -162,7 +162,7 @@ export class Joystick extends PIXI.Container {
           angle = 90;
           direction = Direction.TOP;
         }
-        that.inner.position = centerPoint;
+        that.inner.position.set(centerPoint.x, centerPoint.y);
         power = that.getPower(centerPoint);
         that.settings.onChange?.({ angle, direction, power, });
         return;
@@ -179,7 +179,7 @@ export class Joystick extends PIXI.Container {
           direction = Direction.RIGHT;
         }
 
-        that.inner.position = centerPoint;
+        that.inner.position.set(centerPoint.x, centerPoint.y);
         power = that.getPower(centerPoint);
         that.settings.onChange?.({ angle, direction, power, });
         return;
@@ -227,7 +227,7 @@ export class Joystick extends PIXI.Container {
       power = that.getPower(centerPoint);
 
       direction = that.getDirection(centerPoint);
-      that.inner.position = centerPoint;
+      that.inner.position.set(centerPoint.x, centerPoint.y);
 
       that.settings.onChange?.({ angle, direction, power, });
     };
