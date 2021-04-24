@@ -1,6 +1,6 @@
 # 🕹 pixi-virtual-joystick
 
-Virtual Touch Joystick for [pixi.js](https://github.com/pixijs/pixi.js)
+Virtual Touch Joystick for [pixi.js](https://github.com/pixijs/pixi.js), tested on both Pixi v5 and Pixi v6.
 
 <img src="screenshot.gif?raw=1" />
 
