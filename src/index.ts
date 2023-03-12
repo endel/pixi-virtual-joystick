@@ -90,13 +90,13 @@ export class Joystick extends PIXI.Container {
     this.interactive = true;
 
     let dragging: boolean = false;
-    let eventData: PIXI.InteractionData;
+    let eventData: PIXI.FederatedEvent;
     let power: number;
     let startPosition: PIXI.Point;
 
-    function onDragStart(event: PIXI.InteractionEvent) {
+    function onDragStart(event: PIXI.FederatedPointerEvent) {
       eventData = event.data;
-      startPosition = eventData.getLocalPosition(that);
+      startPosition = that.toLocal(event.global);
 
       dragging = true;
       that.inner.alpha = 1;
@@ -104,7 +104,7 @@ export class Joystick extends PIXI.Container {
       that.settings.onStart?.();
     }
 
-    function onDragEnd(event: PIXI.InteractionEvent) {
+    function onDragEnd(event: PIXI.FederatedPointerEvent) {
       if (dragging == false) { return; }
 
       that.inner.position.set(0, 0);
@@ -115,10 +115,10 @@ export class Joystick extends PIXI.Container {
       that.settings.onEnd?.();
     }
 
-    function onDragMove(event: PIXI.InteractionEvent) {
+    function onDragMove(event: PIXI.FederatedPointerEvent) {
       if (dragging == false) { return; }
 
-      let newPosition = eventData.getLocalPosition(that);
+      let newPosition = that.toLocal(event.global);
 
       let sideX = newPosition.x - startPosition.x;
       let sideY = newPosition.y - startPosition.y;
